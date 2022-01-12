@@ -6,6 +6,16 @@ categories: capybara
 ---
 I recently added a "Locate me" button to [Film Chase](https://www.filmchase.com), which uses the Geolocation API (specifically [`getCurrentPosition`](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition)) to get the current position of the users device.
 
+Clicking the `Locate me` button triggers some Javascript like this:
+
+```javascript
+getPosition() {
+  navigator.geolocation.getCurrentPosition((position) => {
+    this.filter(position.coords.latitude, position.coords.longitude);
+  });
+}
+```
+
 I was keen to add a Capybara feature specification to test this functionality:
 
 ```ruby
@@ -16,16 +26,6 @@ it 'allows a user to share their current geolocation', :js do
 
   expect(page).to have_text 'Location: Oxford'
 end
-```
-
-Clicking the `Locate me` button triggers some Javascript like this:
-
-```javascript
-getPosition() {
-  navigator.geolocation.getCurrentPosition((position) => {
-    this.filter(position.coords.latitude, position.coords.longitude);
-  });
-}
 ```
 
 This test won't work because headless Chrome isn't configured by default to share your geolocation, so we need to configure this behaviour.
