@@ -1,12 +1,10 @@
 ---
 layout: post
-title:  "Simulate geolocation with Capybara and Chrome headless"
+title:  "Simulate geolocation with Capybara and Headless Chrome"
 date:   2022-01-11 23:02:32 +0000
 categories: capybara
 ---
-I recently added a "Locate me" button to [Film Chase](https://www.filmchase.com), which uses the Geolocation API (specifically [`getCurrentPosition`](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition)) to get the current position of the users device.
-
-Clicking the `Locate me` button triggers some Javascript like this:
+I recently added a "Locate me" button to [Film Chase](https://www.filmchase.com), which uses the Geolocation API (specifically [`getCurrentPosition`](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition)) to get the current position of the users device. Clicking the `Locate me` button triggers some Javascript like this:
 
 ```javascript
 getPosition() {
@@ -43,7 +41,7 @@ page.driver.browser.execute_cdp(
 )
 ```
 
-Attempting to run that specification won't work yet because we also need to grant the browser permission to access the geolocation, and we can achieve this with:
+Attempting to run that test still won't work because we also need to grant the browser permission to access the geolocation, and we can achieve this with:
 
 ```ruby
 page.driver.browser.execute_cdp(
