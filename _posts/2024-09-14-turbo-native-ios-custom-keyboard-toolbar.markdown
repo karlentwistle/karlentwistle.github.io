@@ -223,10 +223,49 @@ Now, when you run the app in the simulator and navigate to any path except `/sig
 ![Screenshot showing iOS keyboard with no toolbar](/assets/turbo-native-ios-custom-keyboard-toolbar/no-toolbar.png){: width="300" }
 ![Screenshot showing the default iOS keyboard toolbar still being shown](/assets/turbo-native-ios-custom-keyboard-toolbar/default-toolbar-still-shown.png){: width="300" }
 
+### Alternative Approach: Using Strada for Toolbar Customization
+
+Instead of using Path Configuration to toggle the toolbar, you can also use Strada to customize the toolbar. If we revert the change we made to the `path-configuration.json` file and remove the `setDefaultToolbar(enabled: defaultToolbarEnabled)` calls from the `TurboNavigationController` class, we can use Strada to toggle the toolbar instead.
+
+This can be be done editing the `Strada/FormComponent.swift`. If we add two new functions to the `FormComponent` class:
+
+```swift
+final class FormComponent: BridgeComponent {
+    // ... existing code
+
+    private func disableDefaultToolbar() {
+        (delegate.webView as? CustomWebView)?.setDefaultToolbar(enabled: false)
+    }
+
+    private func enableDefaultToolbar() {
+        (delegate.webView as? CustomWebView)?.setDefaultToolbar(enabled: true)
+    }
+}
+```
+
+We can then hook into the Strada lifecycle methods to call these functions.
+
+```swift
+private func handleConnectEvent(message: Message) {
+    guard let data: MessageData = message.data() else { return }
+    configureBarButton(with: data.submitTitle)
+    disableDefaultToolbar()
+}
+
+override func onViewWillDisappear() {
+    enableDefaultToolbar()
+}
+```
+
 ### Conclusion
 
-And that’s it! You’ve successfully customized the toolbar shown above the keyboard on iOS when interacting with a text field in a Turbo Native app. You can extend this further by adding your custom toolbar with additional buttons or functionality.
+We've explored two methods to customize the toolbar shown above the keyboard in a Turbo Native app:
 
-One limitation of this approach is that the toolbar can only be customized on a per-path basis. If you need to customize the toolbar based on other conditions, you may need to explore alternative options.
+1. Using Path Configuration: This approach allows you to enable or disable the default toolbar based on specific URL patterns defined in your `path-configuration.json` file.
+2. Using Strada and editing `FormComponent`: This method provides dynamic control over the toolbar by leveraging Strada's communication bridge between your native code and web content. It enables you to toggle the toolbar based on user interactions within the web view.
+
+The path configuration approach is likely better suited if you simply want to enable or disable the toolbar based on specific paths. The Strada approach is more appropriate if you'd like to add buttons to the toolbar that interact with the web content.
+
+One limitation of both approaches is that the toolbar can only be customized on a per-path or per-screen basis. If you need to customize the toolbar based on other conditions, you may need to explore alternative options.
 
 I hope this is helpful!
